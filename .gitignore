@@ -1,0 +1,4 @@
+cache.sqlite
+request_cache.sqlite
+*.sqlite
+.ipynb*
