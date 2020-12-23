@@ -9,6 +9,11 @@ jupyterlab = "*"
 bs4 = "*"
 requests-cache = "*"
 urllib3 = "*"
+requests-html = "*"
+selenium = "*"
+matplotlib = "*"
+bokeh = "*"
+pandas-profiling = "*"
 
 [dev-packages]
 

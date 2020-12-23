@@ -1,4 +1,6 @@
-cache.sqlite
-request_cache.sqlite
+*.sqlite
 *.sqlite
 .ipynb*
+*.xls
+*.csv
+*.db
