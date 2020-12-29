@@ -1,3 +1,6 @@
+
+![Architecture](https://github.com/samhld/nba_stats/blob/main/imgs/nba_app.png)
+
 # What will it do?
 
 ## __Backend should support__
