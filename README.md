@@ -44,7 +44,13 @@ __(Optional) Return time series by conference__
 __Player comparisons__
 * Support side by side tables of basic or advanced stats given parameters for players or teams
 
-
+# Data tables
+* Players
+  - Table of all players and their per-game stats (basic and advanced) at the season level
+* Gamelog
+  - Each player will have their own gamelog table with a foreign key to the players table
+* Shot chart
+  - Each player will have shot
 
 # Work to be done
 Select a method of "querying".   
