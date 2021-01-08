@@ -1,6 +1,6 @@
 import pandas as pd
-from typing import List
-from static import create_player_dict
+from builders import create_player_dict
+import json
 
 PLAYER_DICT = create_player_dict()
 
