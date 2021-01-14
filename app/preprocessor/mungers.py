@@ -51,3 +51,4 @@ def concat_row(row: pd.DataFrame, df: pd.DataFrame, to_top=True):
         to_top: bool determining whether the row is appanded to top of df or bottom
     """
     pd.concat([row,df], keys=list(PLAYER_DICT.keys())) # persist player_dict so don't have to call func each time
+

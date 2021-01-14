@@ -1,17 +1,17 @@
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-from mungers import 
+# from mungers import 
 from PandasBasketball import pandasbasketball as pb
 from PandasBasketball.stats import player_stats, team_stats, player_gamelog, n_days
+from relational.getters import get_players_tables
 
-def create_player_stats_df(player_url, stat):
-    return player_stats(requests.get(url), stat)
 
-def create_all_player_stats_df(stat="per_minute"):
-    player_stats_dfs = [create_player_stats_df(url, stat) for url in full_player_urls]
-    all_player_stats_df = pd.concat(player_stats_dfs, keys=list(create_player_dict().keys())) # persist player_dict so don't have to call func each time
-    return all_player_stats_df
+class Table:
+    def __init__(self, url=None):
+        self.request = requests.get(url)
+        self.soup = BeautifulSoup(self.request, "html.parser")
+
 
 def create_player_dict():
     """Returns dictionary mapping full player names to their page encoding determined by B-R
@@ -25,7 +25,7 @@ def create_player_dict():
     """
     player_dict = {}
 
-    for players_table in _get_players_tables():
+    for players_table in get_players_tables():
         players_name_rows = players_table.find("tbody").find_all("th")
         filenames = [row["data-append-csv"] for row in players_name_rows]
 
@@ -37,3 +37,20 @@ def create_player_dict():
             player_dict[f"{first} {last}"] = encoding
 
     return player_dict 
+
+"""
+Below functions are shortcuts to creating DataFrames.
+They will likely be used to initially generate DataFrames in cases of failure / data loss.
+"""
+def create_player_stats_df(player_url, stat):
+    return player_stats(requests.get(url), stat)
+
+def create_all_player_stats_df(stat="per_minute"):
+    player_stats_dfs = [create_player_stats_df(url, stat) for url in full_player_urls]
+    all_player_stats_df = pd.concat(player_stats_dfs, keys=list(create_player_dict().keys())) # persist player_dict so don't have to call func each time
+    return all_player_stats_df
+
+def get_last_row(table):
+    body = table.find("tbody")
+    rows = body.find_all("tr")
+    return rows[-1]

@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from PandasBasketball import pandasbasketball as pb
 from PandasBasketball.stats import player_stats, team_stats, player_gamelog, n_days
 
-def _get_players_letter_dirs():
+def get_players_letter_dirs():
     """Returns list of URLs where each URL holds all the players
     with last names starting with each respective lettergraphene.Abstract()
     Example:
@@ -20,9 +20,9 @@ def _get_players_letter_dirs():
     return players_letter_dirs
 
 
-def _get_players_tables():
+def get_players_tables():
     players_tables = []
-    for letter_dir in _get_players_letter_dirs():
+    for letter_dir in get_players_letter_dirs():
         r = requests.get(letter_dir)
         soup = BeautifulSoup(r.text, "html.parser")
         players_table = soup.find("table", id="players")
@@ -30,7 +30,7 @@ def _get_players_tables():
     
     return players_tables
 
-def _get_full_player_urls():
+def get_full_player_urls():
     """Returns list of URLs for all respective player pages
     Example:
     >> full_player_urls[400:1600:100]
@@ -48,8 +48,10 @@ def _get_full_player_urls():
     'http://www.basketball-reference.com/players/g/gladnmi01.html']
     """
     full_player_urls = []
-    for letter_dir in _get_players_letter_dirs():
+    for letter_dir in get_players_letter_dirs():
         for encoding in player_dict.values():
             if encoding.startswith(letter_dir[-2]):
                 full_player_urls.append(letter_dir+encoding+".html")
     return full_player_urls
+
+# def get_latest(table)
