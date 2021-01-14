@@ -17,6 +17,7 @@ pandas-profiling = "*"
 qgrid = "*"
 nba-api = "*"
 tqdm = "*"
+html5lib = "*"
 
 [dev-packages]
 

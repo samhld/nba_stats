@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 # from mungers import 
 from PandasBasketball import pandasbasketball as pb
 from PandasBasketball.stats import player_stats, team_stats, player_gamelog, n_days
-from relational.getters import get_players_tables
+from scraper.getters import get_players_tables
 
 
 class Table:
