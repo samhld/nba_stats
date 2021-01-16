@@ -5,6 +5,11 @@ from bs4 import BeautifulSoup
 from PandasBasketball import pandasbasketball as pb
 from PandasBasketball.stats import player_stats, team_stats, player_gamelog, n_days
 import hashlib
+import json
+
+PLAYER_BASE_URL = "https://www.basketball-reference.com/players/"
+TEAM_BASE_URL = "https://www.basketball-reference.com/teams/"
+PLAYER_REF_PATH = ""
 
 def get_players_letter_dirs():
     """Returns list of URLs where each URL holds all the players
@@ -20,6 +25,16 @@ def get_players_letter_dirs():
     players_letter_dirs = [f"http://www.basketball-reference.com/players/{letter}/" for letter in letters]
     return players_letter_dirs
 
+def get_player_dict():
+    with open("/Users/samdillard/python/github.com/samhld/nba_stats/app/dbs/player_ref.json", "r") as f:
+        player_dict = json.loads(f.read())
+    return player_dict
+
+def get_player_url(player):
+    """Returns Str of full url for a player's stats page"""
+    player_dict = get_player_dict()
+    player_letter = player_dict[f"{player}"][0]
+    return f"{PLAYER_BASE_URL}/{player_letter}/{player_dict[player]}.html"
 
 def get_players_tables():
     players_tables = []

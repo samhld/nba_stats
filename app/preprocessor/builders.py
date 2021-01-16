@@ -50,7 +50,14 @@ def create_all_player_stats_df(stat="per_minute"):
     all_player_stats_df = pd.concat(player_stats_dfs, keys=list(create_player_dict().keys())) # persist player_dict so don't have to call func each time
     return all_player_stats_df
 
-def get_last_row(table):
+def get_html_table(player):
+    """Returns HTML table """
+
+def get_last_row(html_table, tdata):
+    """Returns the last row in the passed table."""
+
+    Params:
+    table: 
     body = table.find("tbody")
     rows = body.find_all("tr")
     return rows[-1]
