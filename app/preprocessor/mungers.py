@@ -3,6 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 from PandasBasketball import pandasbasketball as pb
 from PandasBasketball.stats import player_stats, team_stats, player_gamelog, n_days
+from scraper.getters import get_player_dict
 
 def date_to_index(df, date_column='Date', inplace=True):
     """Replaces the index of target Pandas DataFrame with the desired column by label.
@@ -40,7 +41,7 @@ def merge_player_dfs(basic_stats_df, adv_stats_df, cols_to_strip=7):
 def sampling(df, sample_rule):
     df.resample(rule=f"{sample_rule}")
 
-def concat_row(row: pd.DataFrame, df: pd.DataFrame, to_top=True):
+def append_row(row: pd.DataFrame, df: pd.DataFrame, to_top=True):
     """Returns a DataFrame that is a concatination of multiple DataFrames. 
         A DataFrame can be single row and likely will be.  DF/row are both assumed
         to be primed for concatenation already.  Other functions do the priming.
@@ -50,5 +51,5 @@ def concat_row(row: pd.DataFrame, df: pd.DataFrame, to_top=True):
         df: DataFrame target for appended row
         to_top: bool determining whether the row is appanded to top of df or bottom
     """
-    pd.concat([row,df], keys=list(PLAYER_DICT.keys())) # persist player_dict so don't have to call func each time
-
+    # return pd.concat([row,df], keys=list(get_player_dict().keys())) # persist player_dict so don't have to call func each time
+    return df.append(row)
