@@ -6,6 +6,7 @@ from PandasBasketball import pandasbasketball as pb
 from PandasBasketball.stats import player_stats, team_stats, player_gamelog, n_days
 import hashlib
 import json
+import time
 
 PLAYER_BASE_URL = "https://www.basketball-reference.com/players/"
 TEAM_BASE_URL = "https://www.basketball-reference.com/teams/"
@@ -26,8 +27,12 @@ def get_players_letter_dirs():
     return players_letter_dirs
 
 def get_player_dict():
-    with open("/Users/samdillard/python/github.com/samhld/nba_stats/app/dbs/player_ref.json", "r") as f:
+    f = open("/Users/samdillard/python/github.com/samhld/nba_stats/app/dbs/player_ref.json", "r")
+    if f:
         player_dict = json.loads(f.read())
+    else:
+        from preprocessor.builders import create_player_dict
+        player_dict = create_player_dict()
     return player_dict
 
 def get_player_url(player):
@@ -46,7 +51,7 @@ def get_players_tables():
     
     return players_tables
 
-def get_full_player_urls():
+def get_full_player_urls(segment: slice=None):
     """Returns list of URLs for all respective player pages
     Example:
     >> full_player_urls[400:1600:100]
@@ -62,10 +67,13 @@ def get_full_player_urls():
     'http://www.basketball-reference.com/players/f/fesenky01.html',
     'http://www.basketball-reference.com/players/f/fundela01.html',
     'http://www.basketball-reference.com/players/g/gladnmi01.html']
+
+    Params:
+    segment: expects a slice
     """
     full_player_urls = []
     for letter_dir in get_players_letter_dirs():
-        for encoding in player_dict.values():
+        for encoding in list(get_player_dict().values())[segment]:
             if encoding.startswith(letter_dir[-2]):
                 full_player_urls.append(letter_dir+encoding+".html")
     return full_player_urls
