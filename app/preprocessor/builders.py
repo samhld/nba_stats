@@ -44,14 +44,32 @@ Below functions are shortcuts to creating DataFrames.
 They will likely be used to initially generate DataFrames in cases of failure / data loss.
 """
 def create_player_stats_df(player_url, stat):
-    return player_stats(requests.get(player_url), stat)
+    try:
+        res = requests.get(player_url)
+        player_df = player_stats(res, stat)
+        # Get player name at player_url
+        soup = BeautifulSoup(res.text, "lxml")
+        _player = soup.find("h1").text.strip()
+        # Create two levels for MultiIndex
+        level1 = [_player]*len(player_df)
+        level2 = list(range(1,len(player_df)+1))
+        # Create MultiIndex and set it
+        mi = pd.MultiIndex.from_arrays([level1, level2], names=("Player", "Year"))
+        player_df.set_index(mi, inplace=True)
+        print(f"url: {player_url}. {player_df.index[0]}")
+
+    except TypeError as e:
+        print(f"{e}: url was {player_url}")
+    
+    return player_df
 
 def create_all_player_stats_df(stat="per_minute", segment=slice(None)):
     player_stats_dfs = []
     for url in get_full_player_urls(segment):
+
         player_stats_dfs.append(create_player_stats_df(url, stat))
         time.sleep(.5)
-    all_player_stats_df = pd.concat(player_stats_dfs, keys=list(create_player_dict().keys()), names=["player","year_count"]) # persist player_dict so don't have to call func each time
+    all_player_stats_df = pd.concat(player_stats_dfs) # persist player_dict so don't have to call func each time
     return all_player_stats_df
 
 def get_html_table(player):
