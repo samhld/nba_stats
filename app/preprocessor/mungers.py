@@ -53,3 +53,7 @@ def append_row(row: pd.DataFrame, df: pd.DataFrame, to_top=True):
     """
     # return pd.concat([row,df], keys=list(get_player_dict().keys())) # persist player_dict so don't have to call func each time
     return df.append(row)
+
+def to_numeric(df):
+    df[df.columns] = df[df.columns].apply(pd.to_numeric, errors="ignore")
+    return df

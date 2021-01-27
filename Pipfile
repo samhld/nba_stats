@@ -18,6 +18,8 @@ qgrid = "*"
 nba-api = "*"
 tqdm = "*"
 html5lib = "*"
+fuzzywuzzy = "*"
+python-levenshtein = "*"
 
 [dev-packages]
 

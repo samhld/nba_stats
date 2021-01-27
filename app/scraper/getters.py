@@ -7,6 +7,7 @@ from PandasBasketball.stats import player_stats, team_stats, player_gamelog, n_d
 import hashlib
 import json
 import time
+from fuzzywuzzy import fuzz
 
 PLAYER_BASE_URL = "https://www.basketball-reference.com/players/"
 TEAM_BASE_URL = "https://www.basketball-reference.com/teams/"
@@ -92,5 +93,19 @@ def compare_hash(hash1, hash2):
     return hash1 == hash2
 
 
-
+def match_player_names(input_name, player_dict):
+    matches = []
+    # if player_dict:
+    for player in list(map(lambda player: player.lower(), player_dict.keys())):
+        if fuzz.partial_ratio(input_name, player) > 75:
+            matches.append(player)
+    # else:
+    #     # player_dict = get_player_dict()
+    #     # for player in list(map(lambda player: player.lower(), player_dict.keys())):
+    #     #     if fuzz.partial_ratio(input_name, player) > 75:
+    #     #         matches.append(player)
+    #     # print(player_dict)
+    #     match_player_names(input_name, player_dict=get_player_dict())
+    
+    return matches
 # def get_latest(table)
