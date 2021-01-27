@@ -54,7 +54,7 @@ def create_player_stats_df(player_url, stat):
         level1 = [_player]*len(player_df)
         level2 = list(range(1,len(player_df)+1))
         # Create MultiIndex and set it
-        mi = pd.MultiIndex.from_arrays([level1, level2], names=("Player", "Year"))
+        mi = pd.MultiIndex.from_arrays([level1, level2], names=("Player", "Year-Stint"))
         player_df.set_index(mi, inplace=True)
         print(f"url: {player_url}. {player_df.index[0]}")
 
@@ -66,7 +66,6 @@ def create_player_stats_df(player_url, stat):
 def create_all_player_stats_df(stat="per_minute", segment=slice(None)):
     player_stats_dfs = []
     for url in get_full_player_urls(segment):
-
         player_stats_dfs.append(create_player_stats_df(url, stat))
         time.sleep(.5)
     all_player_stats_df = pd.concat(player_stats_dfs) # persist player_dict so don't have to call func each time
