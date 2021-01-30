@@ -49,7 +49,7 @@ def create_player_stats_df(player_url, stat):
         player_df = player_stats(res, stat)
         # Get player name at player_url
         soup = BeautifulSoup(res.text, "lxml")
-        _player = soup.find("h1").text.strip()
+        _player = soup.find("h1").text.strip()     # Get name of player from HTML
         # Create two levels for MultiIndex
         level1 = [_player]*len(player_df)
         level2 = list(range(1,len(player_df)+1))
@@ -67,7 +67,7 @@ def create_all_player_stats_df(stat="per_minute", segment=slice(None)):
     player_stats_dfs = []
     for url in get_full_player_urls(segment):
         player_stats_dfs.append(create_player_stats_df(url, stat))
-        time.sleep(.5)
+        time.sleep(1)
     all_player_stats_df = pd.concat(player_stats_dfs) # persist player_dict so don't have to call func each time
     return all_player_stats_df
 

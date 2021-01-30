@@ -1,7 +1,8 @@
 import pandas as pd
 import requests
 import string
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as bs
+from bs4 import NavigableString
 from PandasBasketball import pandasbasketball as pb
 from PandasBasketball.stats import player_stats, team_stats, player_gamelog, n_days
 import hashlib
@@ -52,7 +53,7 @@ def get_players_tables():
     
     return players_tables
 
-def get_full_player_urls(segment: slice=None):
+def get_full_player_urls(segment=slice(None)):
     """Returns list of URLs for all respective player pages
     Example:
     >> full_player_urls[400:1600:100]
@@ -109,3 +110,48 @@ def match_player_names(input_name, player_dict):
     
     return matches
 # def get_latest(table)
+
+def _get_player_table(url, stat):
+    
+    one_header_tables = ["totals", "per_minute", "per_poss", "advanced",
+                        "playoffs_per_game", "playoffs_totals", "playoffs_per_minute",
+                        "playoffs_per_poss", "playoffs_advanced"]
+    
+    two_header_tables = ["adj_shooting", "playoffs_shooting", "shooting", "pbp", "playoffs_pbp"]
+    
+    res = requests.get(url)
+    
+    if stat == "per_game":
+        
+        soup = bs(res.text, "lxml")
+        table = soup.find("table", id="per_game")
+        
+    elif stat in one_header_tables or stat in two_header_tables:
+
+        soup = bs(res.text, "lxml")
+        comment_table = soup.find(text=lambda x: isinstance(x, NavigableString) and f'id="{stat}"' in x)
+        soup = bs(comment_table, "lxml")
+        table = soup.find("table", id=stat)
+        
+        if stat in two_header_tables:
+            
+            table.find("tr").decompose()
+
+    else:
+        raise TableNonExistent
+    
+    return table
+
+def get_all_player_tables(url):
+    
+    supported_tables = ["totals", "per_minute", "per_poss", "advanced",
+                        "playoffs_per_game", "playoffs_totals", "playoffs_per_minute",
+                        "playoffs_per_poss", "playoffs_advanced", "adj_shooting", 
+                        "playoffs_shooting", "shooting", "pbp", "playoffs_pbp"]
+    
+    tables = []
+    for table in supported_tables:
+        print(table)
+        tables.append(_get_player_table(url, table))
+        
+    return tables
