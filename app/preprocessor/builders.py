@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup as bs
 from PandasBasketball import pandasbasketball as pb
 from PandasBasketball.stats import player_stats, team_stats, player_gamelog, n_days
 from scraper.getters import get_players_tables, get_full_player_urls
+from preprocessor.mungers import to_numeric
 import time
 
 
@@ -56,6 +57,7 @@ def create_player_stats_df(player_url, stat):
         # Create MultiIndex and set it
         mi = pd.MultiIndex.from_arrays([level1, level2], names=("Player", "Year-Stint"))
         player_df.set_index(mi, inplace=True)
+        to_numeric(player_df)
         print(f"url: {player_url}. {player_df.index[0]}")
 
     except TypeError as e:
