@@ -10,8 +10,9 @@ import json
 import time
 from fuzzywuzzy import fuzz
 
-PLAYER_BASE_URL = "https://www.basketball-reference.com/players/"
-TEAM_BASE_URL = "https://www.basketball-reference.com/teams/"
+BASE_URL = "https://www.basketball-reference.com"
+PLAYER_BASE_URL = "http://www.basketball-reference.com/players"
+TEAM_BASE_URL = "https://www.basketball-reference.com/teams"
 PLAYER_REF_PATH = ""
 
 def get_players_letter_dirs():
@@ -25,7 +26,7 @@ def get_players_letter_dirs():
         'http://www.basketball-reference.com/players/e/']
     """
     letters = string.ascii_lowercase
-    players_letter_dirs = [f"http://www.basketball-reference.com/players/{letter}/" for letter in letters]
+    players_letter_dirs = [f"{PLAYER_BASE_URL}/{letter}/" for letter in letters]
     return players_letter_dirs
 
 def get_player_dict():
@@ -44,10 +45,11 @@ def get_player_url(player):
     return f"{PLAYER_BASE_URL}/{player_letter}/{player_dict[player]}.html"
 
 def get_players_tables():
+    """Returns a list of players pages tables"""
     players_tables = []
     for letter_dir in get_players_letter_dirs():
         r = requests.get(letter_dir)
-        soup = BeautifulSoup(r.text, "html.parser")
+        soup = bs(r.text, "html.parser")
         players_table = soup.find("table", id="players")
         players_tables.append(players_table)
     
@@ -86,7 +88,7 @@ def hash_page(url):
     hashes to monitor the existence of page changes.
     """
     res = requests.get(url)
-    soup = BeautifulSoup(res.content, "lxml")
+    soup = bs(res.content, "lxml")
     return hashlib.md5(repr(soup).encode("utf-8"))
 
 def compare_hash(hash1, hash2):
@@ -144,7 +146,7 @@ def _get_player_table(url, stat):
 
 def get_all_player_tables(url):
     
-    supported_tables = ["totals", "per_minute", "per_poss", "advanced",
+    supported_tables = ["per_game", "totals", "per_minute", "per_poss", "advanced",
                         "playoffs_per_game", "playoffs_totals", "playoffs_per_minute",
                         "playoffs_per_poss", "playoffs_advanced", "adj_shooting", 
                         "playoffs_shooting", "shooting", "pbp", "playoffs_pbp"]
