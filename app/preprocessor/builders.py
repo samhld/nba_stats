@@ -47,7 +47,7 @@ They will likely be used to initially generate DataFrames in cases of failure / 
 def create_player_stats_df(player_url, stat):
     try:
         res = requests.get(player_url)
-        player_df = player_stats(res, stat)
+        player_df = player_stats(res, stat, numeric=True)
         # Get player name at player_url
         soup = bs(res.text, "lxml")
         _player = soup.find("h1").text.strip()     # Get name of player from HTML
@@ -57,7 +57,7 @@ def create_player_stats_df(player_url, stat):
         # Create MultiIndex and set it
         mi = pd.MultiIndex.from_arrays([level1, level2], names=("Player", "Year-Stint"))
         player_df.set_index(mi, inplace=True)
-        to_numeric(player_df)
+        # to_numeric(player_df) # taken care of in call to `player_stats()` above
         print(f"url: {player_url}. {player_df.index[0]}")
 
     except TypeError as e:
@@ -65,7 +65,7 @@ def create_player_stats_df(player_url, stat):
     
     return player_df
 
-def create_all_player_stats_df(stat="per_minute", segment=slice(None)):
+def create_all_player_stats_df(stat="per_minute", segment=slice(None), initialize_players=False):
     player_stats_dfs = []
     for url in get_full_player_urls(segment):
         player_stats_dfs.append(create_player_stats_df(url, stat))
@@ -82,3 +82,16 @@ def get_last_row(html_table, tdata):
     body = table.find("tbody")
     rows = body.find_all("tr")
     return rows[-1]
+
+def create_player_detail_df(url):
+    """Returns DF from a url that follows a player's details page, i.e., gamelog, splits, on-off, etc.
+        `url` expected to be element of output of `getters.split_detail_paths()`"""
+#     if "gamelog/" in url:
+    res = requests.get(url)
+    df = player_gamelog(res)
+    df = df.drop(df.columns[4], axis=1)
+    to_numeric(df)
+    index = pd.DatetimeIndex(df["Date"])
+    df.set_index(index, inplace=True)
+
+    return df

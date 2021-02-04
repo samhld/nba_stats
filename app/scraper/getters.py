@@ -9,6 +9,7 @@ import hashlib
 import json
 import time
 from fuzzywuzzy import fuzz
+import re
 
 BASE_URL = "https://www.basketball-reference.com"
 PLAYER_BASE_URL = "http://www.basketball-reference.com/players"
@@ -157,3 +158,46 @@ def get_all_player_tables(url):
         tables.append(_get_player_table(url, table))
         
     return tables
+
+def get_player_detail_paths(player_url):
+    """
+    Returns list of all player-specifc URLs found near bottom of player page.
+    Includes URLs for gamelogs, splits, shooting, lineups, and on-off stats.
+    """
+    res = requests.get(player_url)
+    soup = bs(res.text, "lxml")
+    all_paths_lists = soup.find("div", id="inner_nav").find_all("ul", class_="")
+    paths = []
+    for paths_list in all_paths_lists[:5]: # only first 5 lists are relevant
+        for path in paths_list.find_all("li"):
+            paths.append(path.find("a")["href"])
+    return paths
+
+def split_detail_paths(paths):
+    """Returns tuple of lists of paths by category.
+        Takes a list of paths; the return of `get_player_detail_paths()`"""
+    
+    pro_gamelogs = sorted(list(set(filter(lambda x: "gamelog/" in x, paths))))
+    pro_gamelogs_playoffs = sorted(list(set(filter(lambda x: "gamelog-" in x, paths))))
+    
+    splits_by_year = []
+    splits_by_year_pattern = re.compile(r'splits\/\d+')
+    for path in paths:
+        match = splits_by_year_pattern.search(path)
+        if match:
+            splits_by_year.append(match.string)
+            
+    overall_splits_pattern = re.compile(r'splits/')
+    overall_splits = []
+    for path in paths:
+        match = overall_splits_pattern.search(path)
+        if match:
+            overall_splits.append(match.string)
+    
+    shooting = sorted(list(set(filter(lambda x: "shooting/" in x, paths))))
+    
+    lineups = sorted(list(set(filter(lambda x: "lineups/" in x, paths))))
+    
+    on_off = sorted(list(set(filter(lambda x: "on-off/" in x, paths))))
+    
+    return (pro_gamelogs, pro_gamelogs_playoffs, splits_by_year, overall_splits, shooting, lineups, on_off)
